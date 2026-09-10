@@ -46,7 +46,7 @@ what proves the response holds.
 | `/players` returned all 264 unpaginated, including **31 with zero games** ("Kobe (DNP)") | Leaderboards ranked non-players | Zero-game exclusion; mandatory pagination | `07`, `15` | `stats.leaderboard-excludes-zero-games`, `api.pagination-enforced` |
 | Two Clippers players appeared in a Kings box score, unrepresented | Fill-ins had no model | Stat line carries its own `team_id`; attribution by line, not roster | `07`, `08` | `stats.fill-in-attribution` |
 | Stat sheet held a game in client state and saved once; a re-render lost it | Partial save overwrote a valid line | **Progressive persistence**; every increment is a write | `07` | `tracker.progressive-save` |
-| 13 games have box scores that do not sum to their posted score | Real, source-side | Do **not** validate lines against team score; O5 typed slot | `07`, `08` | `result.mismatch-recorded` |
+| 13 games have box scores that do not sum to their posted score | Real, source-side | Do **not** validate lines against team score. Discrepancy detected and recorded with both values; finalisation warns (O5 default) | `07`, `08` | `adr010.discrepancy-behaviour` |
 
 ---
 
