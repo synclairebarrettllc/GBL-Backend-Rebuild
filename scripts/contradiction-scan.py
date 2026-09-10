@@ -198,6 +198,18 @@ for name, body in DOCS.items():
                  f"expected one of {sorted(allowed - set('012345'))} -> {unit.strip()[:52]}")
 
 
+# ---- J. task bundles current ---------------------------------------------
+# Bundles are generated. A stale bundle is a second home for a fact that has
+# already changed — exactly what this specification forbids.
+import hashlib
+_stamp = os.path.join(os.path.dirname(SPEC), "tasks", ".spec-hash")
+if os.path.exists(_stamp):
+    _h = hashlib.sha256()
+    for _n in sorted(DOCS): _h.update(_n.encode()); _h.update(DOCS[_n].encode())
+    if _h.hexdigest() != open(_stamp).read().strip():
+        fail("J1 stale-bundles",
+             "docs/tasks/ is out of date with docs/spec/ — run scripts/build-task-bundles.py")
+
 # ---- report -------------------------------------------------------------
 print(f"Scanned {n_docs} documents, {len(ALL.split())} words, {len(tasks)} tasks.\n")
 if not findings:

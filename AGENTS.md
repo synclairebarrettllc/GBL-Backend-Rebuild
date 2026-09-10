@@ -9,16 +9,28 @@ legacy code here and none is being ported.
 
 ## Start here
 
-**Your specification is [`docs/spec/`](docs/spec/). Open
-[`docs/spec/00_README.md`](docs/spec/00_README.md) first.**
+**Open one task bundle. Do not read the whole specification.**
+
+[`docs/tasks/`](docs/tasks/) holds one self-contained file per task — the task,
+the specification sections it needs, the decision values it must use, and the
+incidents behind its rules. **Average 1,124 words against a 45,000-word
+specification.** Start with [`docs/tasks/README.md`](docs/tasks/README.md) for
+the list, then open exactly the task you are building.
+
+Reading `docs/spec/` end to end will exhaust your context before you write a
+line of code. Go there only when a bundle is missing something — and if you do,
+say so in your report, because it means the generator needs fixing.
+
+The full specification is in [`docs/spec/`](docs/spec/), starting at
+[`docs/spec/00_README.md`](docs/spec/00_README.md).
 
 25 documents. It is the single build specification — there is no second one. If
 another document ever disagrees with it, stop and escalate rather than picking a
 reading.
 
-**Your task queue is [`docs/spec/24_build-tasks.md`](docs/spec/24_build-tasks.md).**
-PR-sized tasks, in order, each with its own definition of done. Work them in
-order. Do not batch them.
+**Your task queue is [`docs/tasks/README.md`](docs/tasks/README.md)** — T1
+through T31 in dependency order, one bundle each. Work them in order. Do not
+batch them, and do not open more than the bundle you are on.
 
 ### Before writing code
 

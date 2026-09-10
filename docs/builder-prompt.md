@@ -112,49 +112,44 @@ REPORT BACK
 
 ## "Just build it" — the whole thing, one prompt
 
-Use this when you want the full backend in one handoff rather than stage by
-stage. It works because the specification is complete and because it makes the
-build **verify itself** — you are not reviewing 10,000 lines of code, the
-acceptance suite is.
-
 ```
 Repository: synclairebarrettllc/GBL-Backend-Rebuild
 
-Read AGENTS.md, then docs/spec/00_README.md.
+Read AGENTS.md, then docs/tasks/README.md.
 
-Build the whole backend. The complete specification is in docs/spec/ — 25
-documents, every architectural rule traced to the failure that caused it. The
-task queue is docs/spec/24_build-tasks.md, T1 through T31, in dependency order.
+Build the whole backend: T1 through T31, in order.
 
-BUILD IN THIS ORDER. It is not negotiable, and here is why:
+CONTEXT DISCIPLINE — READ THIS FIRST
+Open ONE bundle at a time from docs/tasks/. Each is self-contained: the task,
+the spec sections it needs, the decision values, and why its rules exist.
+Average 1,124 words. Do NOT read docs/spec/ end to end — it is 45,000 words and
+will exhaust your context before you write a line of code. Go there only if a
+bundle is missing something, and say so in your report if you do.
 
-1. STAGE 0 FIRST (T1-T7): CI, migration guard, pre-push hook, verified backup,
-   static checks, secret scanning, branch protection. Nobody is reading your
-   diffs. These gates are the review. Do not skip them to get to the
-   interesting part.
-   Each gate must REFUSE something before you move on — show a bad input being
+BUILD IN THIS ORDER. It is not negotiable:
+
+1. T1-T7 FIRST — the gates. Nobody is reading your diffs; these are the review.
+   Each gate must REFUSE something before you move on: show a bad input being
    rejected, then a good one passing. A gate that has never said no is untested.
 
-2. THEN THE ACCEPTANCE SUITE (T31, from docs/spec/19_acceptance.md): write the
-   45-step full-season scenario as FAILING tests, before the code that satisfies
-   them. That suite is the definition of done for this entire build.
+2. THEN T31 — the 45-step full-season acceptance scenario, written as FAILING
+   tests before the code that satisfies them. That suite is the definition of
+   done for this whole build.
 
-3. THEN EVERYTHING ELSE (T8-T30) until the acceptance suite is green.
+3. THEN T8-T30 until the acceptance suite is green.
 
-RULES
+RULES (each bundle repeats these — they are not optional)
 - One task = one branch = one PR. Never commit to main.
-- Every policy value is in docs/spec/20_decisions.md. Build what it says. If you
-  need a value it does not contain, STOP AND ASK. Do not pick something
-  reasonable — that is how the previous system acquired rules nobody agreed to.
-- Migrations apply before the code that reads them. This took the old site down
-  twice in one day, the second time during live stat entry.
-- Read docs/spec/22_traceability.md before deleting or simplifying any
-  constraint. Every one of them is there because something broke.
-- Three failed fix/verify cycles on one thing, then stop and report with a
+- Build the values in the bundle's "Decisions" section. If you need one that is
+  not there, STOP AND ASK. Do not pick something reasonable.
+- Migrations apply before the code that reads them.
+- Do not delete a constraint without reading the bundle's "Why these rules
+  exist" section. Every one is there because something broke.
+- Three failed fix/verify cycles on one thing, then stop and report a
   root-cause hypothesis. Do not guess a fourth time.
 
 DO NOT TELL ME IT IS DONE UNTIL THE ACCEPTANCE SUITE PASSES.
-Specifically these three, which are where a plausible-looking build fails:
+These three are where a plausible-looking build fails:
   - reversing a correction restores a byte-identical standings table
   - renaming every bracket round label changes nothing
   - deleting every projection and recomputing gives byte-identical results
@@ -162,15 +157,14 @@ Specifically these three, which are where a plausible-looking build fails:
 REPORT BACK
 - The acceptance suite output
 - Every gate's refusal output
-- Anything in the specification that was wrong, ambiguous, or missing. You are
-  the first person to actually use it. Say what did not hold up.
+- Anything in the specification that was wrong, ambiguous, or missing, and any
+  bundle you had to look outside of. You are the first to actually use this.
 ```
 
-**Why acceptance-tests-first matters here.** In a one-shot build nobody reads
-the code, so the only thing standing between you and a subtly wrong system is a
-suite that was written from the specification rather than from the
-implementation. Written afterwards, tests describe what the code does. Written
-first, they describe what the league needs.
+**Why acceptance-tests-first.** In a one-shot build nobody reads the code, so
+the only thing between you and a subtly wrong system is a suite written from the
+specification rather than from the implementation. Written afterwards, tests
+describe what the code does. Written first, they describe what the league needs.
 
 
 ---
