@@ -213,7 +213,7 @@ CREATE INDEX ix_roster_current ON roster_membership(team_id) WHERE effective_to 
 CREATE INDEX ix_roster_player  ON roster_membership(player_id);
 ```
 
-**POLICY — O6.** Whether overlapping open memberships are legal is policy. The
+**POLICY — O6. Default: `multi_team_allowed: false`.** The
 schema permits them; if O6 forbids it, add:
 `CREATE UNIQUE INDEX ux_roster_one_open ON roster_membership(player_id) WHERE effective_to IS NULL;`
 That one line is the entire implementation difference — deliberately isolated.

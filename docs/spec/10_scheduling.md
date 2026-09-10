@@ -108,10 +108,11 @@ decided.
 objective_priority = [ <POLICY — O8: ordered list of objective keys> ]
 ```
 
-**Interim behaviour:** the engine satisfies the hard constraints, applies no
-optimisation beyond that, and **reports the resulting balance metrics** so an
-operator can judge the schedule. It does not silently optimise for something
-nobody chose.
+**Default:** the engine satisfies the hard constraints, applies **no further
+optimisation**, and **reports the resulting balance metrics** — home/away split,
+rest days, venue and time-slot distribution — so an operator can judge the
+schedule and re-run. It does not silently optimise for something nobody chose;
+showing the numbers is how the league discovers what it actually cares about.
 
 ---
 

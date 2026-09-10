@@ -158,7 +158,7 @@ Do not report as defects:
 | Out of scope | Why |
 |---|---|
 | A `POLICY` slot carrying its registered value | That is correct behaviour. Report it only if the value **differs** from the register, or was hardcoded instead of configured |
-| Interim behaviour where a slot is empty | Specified in the relevant engine document |
+| A DEFAULT you would have chosen differently | It is the league's call, not the verifier's. Raise it as a policy question, never as a defect |
 | Phase 2 items — migration, Season 3, RecLeague | Deferred by decision (D1, D2, O10) |
 | Missing offline tracker capture | Explicitly deferred (S7) |
 | Absence of a user-facing change log | S25 — corrections are simple overwrites by product decision |

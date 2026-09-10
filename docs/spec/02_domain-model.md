@@ -172,9 +172,10 @@ this team when this game was played" — a plain `team_id` on Player cannot.
 **Fill-ins are real (FACT).** Two legacy players rostered on The Clippers appear
 in a Kings box score on 2026-06-13. The current model has no way to express that.
 
-**POLICY — O6.** Whether a Player may hold overlapping memberships (two teams at
-once), whether a roster lock date exists, and what happens to statistics on
-transfer are **policy decisions**. The schema permits overlap; the domain service
+**POLICY — O6. Defaults: `multi_team_allowed: false`, `roster_lock_date: null`,
+`fill_ins_allowed: true`.** Statistics never move on transfer — a stat line
+carries its own `team_id`, so a player keeps every game they played for the team
+they played it for. The schema permits overlap; the domain service
 enforces whatever O6 decides. The enforcement point is specified; the rule is not.
 
 ---
@@ -252,9 +253,10 @@ all — so both modes exist in the real data.
 and is never inferred. A `derived` result may not be edited directly — correct
 the stat lines. An `entered` result may not be silently converted to `derived`.
 
-**POLICY — O5.** Whether a `derived` result requires player points to sum
-exactly to the team score before finalisation is policy. The validation hook is
-specified in `08_game-results.md`; the rule is a typed empty slot.
+**POLICY — O5. Default: `on_mismatch: 'warn'`** — a box score that does not sum
+to the team score does not block finalisation; the discrepancy is detected,
+recorded with both values, and an authorized person finalises with a stated
+reason. The hook is specified in `08_game-results.md` §4.
 
 ---
 
@@ -337,9 +339,10 @@ from games. If a result is corrected after seeding and the seed was never
 persisted with its basis, the bracket's original justification is unrecoverable
 and "who should have been seeded where" becomes unanswerable.
 
-**POLICY — O4.** Whether a correction reseeds the bracket, leaves it durable, or
-something else is policy. **RECOMMENDATION:** durable seed plus basis snapshot.
-The field exists so the decision is implementable either way.
+**POLICY — O4. Default: `durable`** — the seed stands, and its `basis_snapshot`
+explains any later divergence. A correction that would have moved it raises a
+flagged discrepancy rather than silently reseeding. The field exists so all three
+policies remain implementable without schema change.
 
 ---
 
@@ -409,8 +412,11 @@ A prospective player's submission to join a Season. **In scope (S10).**
 
 **REQUIREMENT.** Registration does **not** capture payment status (S10, S11).
 
-**POLICY — O11.** The waiver vendor is undecided. `waiver_signature_ref` holds
-an opaque external reference; its shape is deliberately unspecified.
+**POLICY — O11.** No e-signature vendor is selected yet, so
+`waiver_signature_ref` holds an opaque external reference whose shape the vendor
+will determine. **Do not build a custom signature flow** — until the slot is
+filled, registration must not be the league's only record of consent (S10
+requires a legally binding waiver).
 
 ---
 

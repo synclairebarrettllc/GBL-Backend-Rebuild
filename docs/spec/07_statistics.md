@@ -76,10 +76,10 @@ and the team score. Do **not** require every rostered player to have a line. Do
 posted score. That is source-side reality, faithfully reproduced. A validator
 that rejects it would make real games unrecordable.
 
-**POLICY — O5.** Whether a *derived* result requires player points to sum to the
-team score **before finalisation** is policy. The hook exists in
-`08_game-results.md`; the rule is a typed empty slot. Until decided,
-finalisation does not check it.
+**POLICY — O5. Default: `on_mismatch: 'warn'`.** A box score that does not sum to
+the team score does **not** block finalisation. The discrepancy is detected
+automatically and recorded with both values, and an authorized person finalises
+with a stated reason. The hook is specified in `08_game-results.md` §4.
 
 ---
 

@@ -331,10 +331,11 @@ the lock, and defined no propagation at all.
 - **REQUIREMENT:** the snapshot is written in the same transaction as the seeds.
   A seed without its basis cannot be explained to a team six weeks later.
 
-#### `reseed(season_id)` — behaviour is **POLICY — O4**
-- The operation is specified; its *legality after finalisation* is policy.
-- All three candidate policies (durable / reseed / snapshot-based) are
-  implementable against this schema without change.
+#### `reseed(season_id)` — **POLICY — O4, default `durable`**
+- Under the default, seeds do **not** move after finalisation. A correction that
+  would have changed one raises a flagged discrepancy for the operator.
+- All three candidate policies (durable / reseed / snapshot-based) remain
+  implementable against this schema without change, so switching is a config edit.
 
 ---
 

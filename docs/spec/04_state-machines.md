@@ -79,7 +79,7 @@ scheduled ──► in_progress ──► completed ──► finalized
 | `scheduled` | `completed` | result entered directly | admin | valid scores | GameResult created (`entered`) |
 | `in_progress` | `completed` | tracker submits, or admin completes | tracker / admin | see O5 | GameResult created/updated (`derived`) |
 | `completed` | `finalized` | finalize | admin | **POLICY — O5** completeness rule | standings recomputed; seed eligibility opens |
-| `finalized` | `completed` | **correction** | admin | correction permitted (**POLICY — O8-equivalent**) | downstream recompute cascades |
+| `finalized` | `completed` | **correction** | admin | permitted — S24 makes correcting stats after the fact a v1 must-have | downstream recompute cascades |
 | `scheduled` | `cancelled` | cancel | admin | — | excluded from standings |
 | any non-final | `forfeited` | forfeit | admin | **POLICY — O2** | counted per policy |
 
@@ -135,8 +135,10 @@ Not a rich lifecycle: a membership is open (`effective_to IS NULL`) or closed.
 A transfer closes one membership and opens another. **Closing a membership never
 touches stat lines** — those reference Player and carry their own `team_id`.
 
-**POLICY — O6.** Whether overlapping open memberships are legal is policy. The
-state machine permits it; RosterService enforces whatever O6 decides.
+**POLICY — O6. Default: `multi_team_allowed: false`** — a Player holds one open
+membership at a time. The state machine still *permits* overlap so the rule stays
+a service-level policy rather than a schema rewrite; RosterService enforces the
+configured value.
 
 ---
 

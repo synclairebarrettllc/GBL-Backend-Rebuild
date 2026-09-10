@@ -62,10 +62,10 @@ degrade to an implicit default.
 computation, seed snapshot and bracket generation stamps the config version it
 used.
 
-This is what keeps **O12** (retroactivity) a decidable question rather than a
-rework: whether completed weeks re-rank under a changed chain is policy, but
-either answer needs to know which config produced which output. The stamp costs
-nothing and is unrecoverable after the fact.
+**O12 is DECIDED as retroactive** — a config change re-ranks the season under the
+new chain. The stamp is what keeps that explicable: any published table can still
+say which rules produced it, so a team asking why a standing moved gets an
+answer. It costs nothing and is unrecoverable after the fact.
 
 ---
 

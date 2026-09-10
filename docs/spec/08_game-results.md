@@ -194,19 +194,26 @@ season.config.finalization_rule = {
 | `warn` | Authorized finalisation proceeds; the discrepancy is visible and recorded |
 | `allow` | Recorded silently; standings move without anyone being told |
 
-**Interim behaviour until decided:** detection, recording and both-value
-retention are **active** (they are requirements above). Finalisation does **not**
-block. The decision can therefore be applied retroactively to already-recorded
-discrepancies without re-deriving anything.
+**Default: `on_mismatch: 'warn'`, `require_box_score_sum: false`,
+`tolerance_points: null`, `override_requires: 'reason'`.** Detection, recording
+and both-value retention are always active (the requirements above). Finalisation
+does **not** block; an authorized person completes it with a stated reason.
+
+Because discrepancies are recorded from day one, a stricter rule can be applied
+retroactively without re-deriving anything.
 
 ---
 
-## 5. Forfeits — POLICY — O2
+## 5. Forfeits — POLICY — O2, default set
 
-A forfeit is a real league outcome and the schema supports it. What it *counts
-as* is policy.
+A forfeit is a real league outcome and the schema supports it.
 
-**Typed slot:**
+**Default: counts as a win/loss, scored `20-0`, no player statistics, affects
+tiebreaks.** The awarded score is not cosmetic — point differential is the S20
+default first tiebreak, so `20-0` keeps a game nobody played from distorting
+seeding.
+
+**Typed slot** (value in `20_decisions.md` O2):
 
 ```
 season.config.forfeit_rule = {
