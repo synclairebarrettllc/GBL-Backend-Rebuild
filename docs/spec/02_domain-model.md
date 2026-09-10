@@ -286,11 +286,9 @@ get a line whose `team_id` is the Kings.
 
 **Scoring is stored as 2PM/3PM/FTM and everything else is derived.**
 
-**Evidence (FACT):** legacy asked for FGM, which silently includes threes. A
-scorekeeper entering "3 twos and 2 threes" as FGM=3, 3PM=2 produced **8 points
-instead of 12**. Separately, validation required FGA — a statistic this league
-does not collect — so `0` read as "zero attempts" rather than "not tracked" and
-**every real stat line was rejected**.
+**Evidence:** storing combined field goals produced **8 points instead of 12**,
+and requiring attempts rejected **every real stat line**
+(`22_traceability.md` §3; specified in `07_statistics.md` §1).
 
 **REQUIREMENT.** `points`, `field_goals_made` and `total_rebounds` are **derived,
 never stored as independent inputs**:

@@ -122,8 +122,81 @@ if len(tasks) != hi:
     fail("H2 task-gap", f"queue declares {len(tasks)} tasks but highest is T{hi}")
 for name, body in DOCS.items():
     for m in re.finditer(r'T1[–-]T(\d+)', body):
+        line_start = body.rfind("\n", 0, m.start()) + 1
+        if body[line_start:m.start()].lstrip().startswith("|"):
+            continue   # a table cell states a phase range, not the queue's extent
         if int(m.group(1)) != hi:
             fail("H2 task-range", f"{name} says T1-T{m.group(1)}; queue ends at T{hi}")
+
+
+# ---- I. evidence figure drift ------------------------------------------
+# LIMIT, stated so nobody over-trusts this: it catches a wrong figure sitting
+# beside a stable anchor phrase — the class of drift that actually occurred,
+# where "game 1971" stayed correct and a "99-point" figure beside it did not.
+# It does NOT catch a rewrite of the anchor phrase itself. Catching that needs
+# a fact database, which is more machinery than this earns.
+# The load-bearing numbers in each recurring evidence story, declared once.
+# A document citing the story with a figure outside its set has drifted — this
+# is the check that would have caught the withdrawn "99-point" citation.
+STORY_FIGURES = {
+    "game 1971":              (r"\b1971\b",                {"1971","5","45","36","81"}),
+    "scoring arithmetic":     (r"8 points instead of 12|12, not 8|3 twos|3 two-pointers",
+                                                            {"8","12","3","2"}),
+    "orphaned admin_logs":    (r"admin_logs",               {"24","401"}),
+    "box scores not summing": (r"\b13 (?:legacy )?games\b", {"13"}),
+    "legacy route file":      (r"8,373",                    {"8373"}),
+    "bracket fix sites":      (r"24 sites",                  {"24","45"}),
+    "deleted_at audit":       (r"62 (?:read )?sites|57 of 62|read sites",
+                                                            {"62","57","45","17","11","7","40","60"}),
+}
+# Records that deliberately quote a retired figure, so the scan does not
+# re-flag the very correction that removed it.
+WITHDRAWAL = re.compile(r"withdraw|earlier draft|no longer reproducible|retired", re.I)
+
+def bare_numbers(line):
+    """Numbers the prose actually asserts: code spans, file refs, section refs,
+    dates and table-cell document pointers are not claims about the story."""
+    t = re.sub(r"`[^`]*`", " ", line)              # code spans and doc refs
+    t = re.sub(r"\d+_[a-z_-]+\.(?:md|sql|cjs|tsx|ts|sh|py)", " ", t)  # filenames
+    t = re.sub(r"\d{4}-\d{2}-\d{2}", " ", t)       # dates
+    t = re.sub(r"[Mm]igrations? \d+", " ", t)      # migration numbers
+    t = re.sub(r"§\s*\d+(\.\d+)?", " ", t)         # section refs
+    t = re.sub(r"\bT\d+\b|\b[SOG]\d+\b", " ", t)  # task and decision ids
+    return {n.replace(",", "") for n in re.findall(r"(?<![\w.-])(\d[\d,]*)(?![\w.])", t)}
+
+# Scope: prose wraps, so a trigger phrase and its figure land on different
+# lines — those need paragraph scope. A table is one paragraph but each row is
+# a self-contained claim, so rows are scoped individually.
+def units(body):
+    """(approx_line, text) claims: table rows singly, prose by paragraph."""
+    out, buf, start = [], [], 1
+    for i, line in enumerate(body.splitlines(), 1):
+        if line.lstrip().startswith("|"):
+            if buf: out.append((start, " ".join(buf))); buf = []
+            out.append((i, line))
+        elif not line.strip():
+            if buf: out.append((start, " ".join(buf))); buf = []
+        else:
+            if not buf: start = i
+            buf.append(line)
+    if buf: out.append((start, " ".join(buf)))
+    return out
+
+# A unit citing two stories may legitimately use both stories' figures, so the
+# allowed set is the union over every story the unit actually mentions.
+for name, body in DOCS.items():
+    for ln_no, unit in units(body):
+        hits = [(lbl, figs) for lbl, (pat, figs) in STORY_FIGURES.items()
+                if re.search(pat, unit)]
+        if not hits: continue
+        if WITHDRAWAL.search(unit): continue
+        allowed = {a.replace(",", "") for _, figs in hits for a in figs}
+        allowed |= {"0", "1", "2", "3", "4", "5"}   # small ordinals in prose
+        for num in bare_numbers(unit) - allowed:
+            fail("I1 figure-drift",
+                 f"{name}:{ln_no} [{'/'.join(l for l, _ in hits)}] cites {num}, "
+                 f"expected one of {sorted(allowed - set('012345'))} -> {unit.strip()[:52]}")
+
 
 # ---- report -------------------------------------------------------------
 print(f"Scanned {n_docs} documents, {len(ALL.split())} words, {len(tasks)} tasks.\n")

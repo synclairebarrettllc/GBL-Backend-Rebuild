@@ -253,8 +253,7 @@ deleted* from *missing*, and decline to resurrect it.
 **REQUIREMENT — the cascade is the point.** A stat write that does not recompute
 the derived score is not a partial implementation; it is the legacy bug.
 
-**Evidence (FACT):** game 1971 holds five real stat lines entered by the league
-owner and still reads `scheduled 0-0`.
+**Evidence:** game 1971 (`22_traceability.md` §3).
 
 #### `deleteStatLine(game_id, player_id)`
 - **Preconditions:** game not `finalized` unless a correction

@@ -172,9 +172,8 @@ GET              /api/admin/dashboard
 
 **REQUIREMENT (S26) — the dashboard flags incomplete work.** Games that have been
 played but are missing scores or stats appear prominently. **Errors surface
-visibly; nothing fails silently.** Game 1971 — five real stat lines, still reading
-`scheduled 0-0` — would have appeared here on the day it happened instead of
-being found months later in an audit.
+visibly; nothing fails silently.** This is the surface that would have caught game
+1971 (`22_traceability.md` §3) on the day rather than months later in an audit.
 
 ### AI read surface (S12)
 

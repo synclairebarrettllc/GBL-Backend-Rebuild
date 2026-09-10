@@ -108,10 +108,9 @@ A projection **may** be cached for read performance. If it is:
 **REQUIREMENT — the missing edge.** Writing stat lines **must** trigger score
 derivation and standings recomputation within the same transaction.
 
-**Evidence (FACT):** in the legacy system, saving a box score recomputes nothing.
-Game 1971 holds five real stat lines entered by the league owner and still reads
-`scheduled 0-0`. That is a missing edge in this graph, and it is the single most
-concrete illustration of why this document exists.
+**Evidence:** the legacy system saved box scores and recomputed nothing — a
+missing edge in exactly this graph. Game 1971 (`22_traceability.md` §3) is the
+concrete case.
 
 ---
 

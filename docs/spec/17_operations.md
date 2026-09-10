@@ -148,9 +148,8 @@ hypothesis.
 played games missing scores or stats, games stuck `in_progress`, imports with
 unresolved conflicts.
 
-**Evidence (FACT).** Game 1971 — five real stat lines, still reading
-`scheduled 0-0` — was found months later during an audit. Nothing in the product
-was looking. The dashboard flag is the fix.
+**Evidence:** game 1971 (`22_traceability.md` §3) was found months later in an
+audit because nothing in the product was looking. The dashboard flag is the fix.
 
 **REQUIREMENT.** Structured logs carry identifiers, never PII
 (`16_security.md` §7). Every log line for a mutation records the operation and

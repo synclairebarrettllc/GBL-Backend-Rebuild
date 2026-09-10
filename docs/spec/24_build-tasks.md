@@ -509,6 +509,56 @@ separately so it is not lost.
 
 ---
 
+## Context feed — what to load for each task
+
+Loading all 25 documents for every task wastes context and dilutes attention.
+T8 writes DDL; it does not need the bracket engine. This table says what to load.
+
+**Two rules that are not negotiable:**
+
+1. **`20_decisions.md` is in every feed.** It holds every policy value. A task
+   run without it will hit a `POLICY` slot it cannot resolve and invent a value —
+   the exact failure the register exists to prevent.
+2. **`22_traceability.md` is in every feed.** It is why the rules exist. A builder
+   that cannot see why a constraint is there will optimise it away, and that is
+   the mechanism behind most of the defects listed in it.
+
+Everything else is loaded per phase.
+
+| Phase | Tasks | Load, in addition to `20` + `22` |
+|---|---|---|
+| **Rails** | T1–T7 | `17_operations`, `18_testing`, `16_security` §6 |
+| **Schema & identity** | T8–T10 | `02_domain-model`, `04_state-machines`, `05_database`, `13_configuration`, `06_mutations` §4.1–4.3 |
+| **Games, results, stats** | T11–T14 | `06_mutations`, `07_statistics`, `08_game-results`, `10_scheduling` §3+§6, `03_source-of-truth` |
+| **Live tracker** | T15–T17 | `07_statistics` §5, `16_security` §2, `15_api` §5, `04_state-machines` |
+| **Standings** | T18–T19 | `09_standings`, `03_source-of-truth`, `13_configuration` §5 |
+| **Playoffs** | T20–T22 | `11_playoffs`, `09_standings` §4, `04_state-machines`, `05_database` |
+| **Registration** | T23–T25 | `12_registration`, `16_security` §7, `02_domain-model`, `04_state-machines` |
+| **Bulk scheduling** | T26–T27 | `10_scheduling`, `06_mutations` §5 |
+| **Read surfaces** | T28–T30 | `15_api`, `16_security`, `09_standings`, `07_statistics` |
+| **Acceptance** | T31 | `19_acceptance`, `18_testing`, and every engine document |
+
+### Not in any builder feed
+
+| Document | Why |
+|---|---|
+| `23_verification-handoff` | Written for the verifier. Feeding it to a builder creates role confusion — it instructs the reader to attack the code, not write it |
+| `14_import-migration` | Phase 2. Deferred by decision (D1); nothing in T1–T31 depends on it |
+| `00_README` | Orientation. Read once, by a person, not per task |
+
+### Load once, at the start
+
+`01_principles.md` — the constitution. Twenty-five rules, each with its origin.
+Not per-task material, but a builder who has never read it will re-derive its
+conclusions the expensive way.
+
+**A note on trimming further.** These feeds were sized against the real risk,
+which is not context cost — it is a builder inventing a value or deleting a
+constraint whose reason it could not see. When in doubt, load `20` and `22`
+and trim something else.
+
+---
+
 ## Rules for working this queue
 
 **REQUIREMENT — implement the stated value; never substitute your own.** Every
