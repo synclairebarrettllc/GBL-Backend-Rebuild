@@ -119,10 +119,10 @@ season.config = {
     fill_ins_allowed:     <boolean>             // FACT: they already happen
   },
 
-  eligibility: {
-    minimum_age:             <int>,
-    guardian_required_under: <int>,
-    age_as_of_date:          <date>             // never "today"
+  eligibility: {                              // values: S38
+    minimum_age:             null,              // no floor beyond guardian consent
+    guardian_required_under: 18,
+    age_as_of_date:          <date, per season> // REQUIRED. never "today"
   },
 
   // ── Scheduling ──────────────────────────────────────  10_scheduling.md
@@ -167,7 +167,7 @@ decimal places, display nouns, leaderboard minimums.
 | `tiebreak.*` chains | A silent default decides who makes the playoffs |
 | `forfeit_rule` | Silently converts a real outcome into a win or a nothing |
 | `finalization_rule` | Decides whether the league's own history is acceptable |
-| `eligibility.age_as_of_date` | Changes who is allowed to play |
+| `eligibility.age_as_of_date` | Changes who is allowed to play, and computing it from "today" makes eligibility change on a birthday mid-season |
 | `composite_metrics.formula` | Decides an award by an unpublished rule |
 | `playoffs.seed_durability` | Decides whether a team's announced seed can move |
 

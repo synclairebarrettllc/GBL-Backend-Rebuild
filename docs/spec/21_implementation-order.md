@@ -1,9 +1,12 @@
 # 21 — Implementation Order
 
 **Status: the plan of record.** G3 is DECIDED — this sequence, decomposed into
-PR-sized tasks in `24_build-tasks.md`, *is* the build inventory
-(`20_decisions.md`). The order is dependency order, not preference; resequencing
-is cheap but the dependencies are real.
+**T1–T31** in `24_build-tasks.md`, *is* the build inventory (`20_decisions.md`).
+The order is dependency order, not preference; resequencing is cheap but the
+dependencies are real.
+
+This document explains **why** the stages fall in this order. `24_build-tasks.md`
+is what you actually work from.
 
 ---
 

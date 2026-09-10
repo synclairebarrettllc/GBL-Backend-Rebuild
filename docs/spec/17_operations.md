@@ -175,16 +175,20 @@ the league is mid-game is how the second outage got worse.
 
 ---
 
-## 8. Platform — O7
+## 8. Platform — O7, DECIDED
 
-**Working default:** Cloudflare Workers + D1 + Pages. It survived bounded
-scrutiny; real constraints (10GB cap, single-writer concurrency, transient errors
-needing retry) are not binding at GBL's scale. Durable Objects + WebSockets is a
-native fit for the live tracker (`07_statistics.md` §5).
+**Cloudflare Workers + D1 + Pages**, with **Durable Objects + WebSockets** for the
+live tracker (`07_statistics.md` §5). Ratified — see `20_decisions.md` O7, which
+is the authority for this value.
 
-**Gate G1's closure applies: Claude Code recommends, the Board decides.** Nothing in
-this specification depends on the platform choice except the DDL dialect and the
-real-time transport.
+It survived bounded scrutiny: the real constraints (10GB D1 cap, single-writer
+concurrency, transient errors needing retry) are not binding at GBL's scale, and
+Cloudflare names live sports scores as the canonical Durable Objects use case.
+
+**Gate G1's process produced this decision** — Claude Code recommended, the Board
+ratified. The gate is closed; the outcome is above. Only the DDL dialect and the
+real-time transport depend on it, but both are Stage 1 work, so a reversal after
+Stage 1 is expensive.
 
 ---
 

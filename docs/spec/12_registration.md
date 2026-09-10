@@ -79,11 +79,14 @@ minimum age at **acceptance**, not at submission.
 **parent/guardian signature** on the waiver. The waiver artefact records who
 signed and in what capacity.
 
+**Settled (S38): GBL v1 allows minors to register and play.** A registration is
+**not** rejected solely because the applicant is under 18.
+
 ```
 season.config.eligibility = {
-  minimum_age:            <int>,
-  guardian_required_under: <int>,
-  age_as_of_date:         <date>      // the age check reference date
+  minimum_age:             null,      // no floor beyond guardian consent
+  guardian_required_under: 18,
+  age_as_of_date:          <date>     // fixed per season. REQUIRED. never "today"
 }
 ```
 

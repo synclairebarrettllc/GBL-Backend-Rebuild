@@ -24,7 +24,7 @@ the games carry the schedule. See `11_playoffs.md`.
 
 ## 2. Time representation — O9
 
-**RECOMMENDATION (O9, AUTHORABLE — Board decides):**
+**O9 — DECIDED:**
 
 - Store instants as **UTC** in a single, consistent format.
 - Store the league's local IANA timezone on `season`.

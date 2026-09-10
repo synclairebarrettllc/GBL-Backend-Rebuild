@@ -182,16 +182,31 @@ recorded decision. That promotion is itself a change to this specification.
 
 | Layer | Home | Authority |
 |---|---|---|
-| Policy decisions, R&D records, governance, handoffs | Notion | Notion is authoritative for **decisions** |
-| Technical specification (this) | `docs/spec/` | Authoritative for **architecture** |
+| Decision **history**, R&D records, governance, handoffs | Notion | Upstream governance — how a decision was reached |
+| Decision **values for this build** | `20_decisions.md` | **Frozen build-time snapshot. The builder reads this and only this** |
+| Architecture | the rest of `docs/spec/` | Authoritative for design |
 | Implementation | `src/`, `migrations/` | Must conform to this specification |
 
-This specification references decisions **by ID** — `S*` settled, `O*` open,
-`G*` gate, catalogued in `20_decisions.md` — and never
-restates their value. If you want to know what the tiebreak chain is, the
-register in Notion is the only correct source. Restating it here would create a
-second home for one fact, which is the failure this whole architecture exists to
-prevent.
+### Why the register is in the repository, not a link to Notion
+
+A builder must be able to work from one immutable package without querying live
+governance mid-implementation — the same discipline the backend itself follows,
+where runtime code reads a controlled configuration snapshot rather than a
+history.
+
+So `20_decisions.md` is **not** a second home for these facts. It is the frozen
+snapshot, and the flow is one-directional:
+
+```
+Board decides  →  recorded in Notion  →  synchronised into 20_decisions.md
+               →  spec version bumped →  builder consumes the snapshot
+```
+
+**REQUIREMENT.** Never edit a value in `20_decisions.md` without the
+corresponding Notion decision. Never send a builder to Notion for a value. Every
+other document in this specification cites decisions **by ID** and does not
+restate their values — that rule still holds, and the register is the one place
+those values live.
 
 ---
 
@@ -223,17 +238,18 @@ lines, 14 playoff games, Season 3 active and unresolved.
 | Section | Status |
 |---|---|
 | 01–06 Foundations | AUTHORED |
-| 07–14 Engines | AUTHORED (policy-dependent behaviour carries typed UNKNOWN slots) |
+| 07–14 Engines | AUTHORED — policy-governed behaviour carries typed `POLICY` slots |
 | 15–19 Surfaces and delivery | AUTHORED |
-| 20 Decisions | AUTHORED — ADR-010 ratified; **every item has a value. Nothing blocks the build** |
-| 21 Implementation order | AUTHORED — **RECOMMENDATION pending G3** |
+| 20 Decisions | AUTHORED — G2, G3, O7, O9, O12 and ADR-010 decided; every other item carries a DEFAULT |
+| 21 Implementation order | AUTHORED — the plan of record |
 | 22 Traceability | AUTHORED |
 | 23 Verification handoff | AUTHORED |
+| 24 Build task queue | AUTHORED — Stages 0–9 decomposed |
 
-**Sections blocked on policy are authored structurally.** The standings engine
-exists with its tiebreak chain as a declared, typed, empty slot. The shape is
-specified; only the value is missing. A decision drops in without redesign, and
-`13_configuration.md` §5 gathers every slot in one place.
+**Policy-governed behaviour is carried in typed `POLICY` slots** so each value
+lives in season config, visible and changeable, rather than hardcoded.
+`13_configuration.md` §5 gathers every slot in one place; `20_decisions.md`
+Part 2 holds every value.
 
 ### Scope reset (settled)
 
@@ -241,8 +257,13 @@ Legacy data migration, Season 3 resolution, and RecLeague/Reckly integration are
 **Phase 2 — not prerequisites** for this rebuild. Live courtside stat tracking,
 registration, scheduling, standings and playoffs are core.
 
-### The cheapest unblocks
+### What remains open
 
-**G3** (ratify the build-piece inventory) and **G2** (ratify the technical rules
-constitution). Both cost a decision rather than a discovery, and
-`21_implementation-order.md` §4 keys everything downstream off them.
+**Nothing that blocks the build.** One item is outstanding and it is a lookup,
+not a decision:
+
+- **O10** — whether "Reckly" and "recleague.net" are one platform or two. Needed
+  only if Phase 2 migration starts; the source is parameterised either way.
+
+Every other item is DECIDED or carries a DEFAULT that can be changed at the cost
+stated in `20_decisions.md`.

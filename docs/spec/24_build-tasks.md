@@ -1,7 +1,10 @@
 # 24 — Build Task Queue
 
 **For the builder.** `21_implementation-order.md` gives stages; a stage is far
-too large for one PR. This is the rolling queue of **PR-sized tasks**, in order.
+too large for one PR. This is the **complete queue** of PR-sized tasks, in order —
+T1 through T31, Stage 0 to acceptance. It is not rolling and it does not defer
+decomposition to later; the execution interface is finished before the build
+starts, because "one task = one branch = one PR" only works if the tasks exist.
 
 **REQUIREMENT.** One task = one branch = one PR. Do not batch tasks. Do not start
 a task whose predecessor is unmerged unless it is marked `INDEPENDENT`.
@@ -273,11 +276,228 @@ line.
 
 ---
 
-## Then
+## Stage 2 — Games, results, statistics [REBUILD]
 
-`21_implementation-order.md` Stage 2 onward — games, results, statistics, and the
-derivation edge. Decompose each stage into tasks in this format as it is reached,
-rather than planning the whole build against decisions that may still move.
+**The heart of the build.** This is where the legacy system's central failure
+lived, and everything downstream reads what this stage produces.
+
+### T11 — ScheduleService, individual operations [BLOCKED by T10]
+**Scope.** `scheduleGame`, `rescheduleGame`, `cancelGame`, `deleteGame`
+(`06_mutations.md` §4.4). Bulk operations are Stage 7 — do not build them here.
+**Done when.** Two games cannot occupy one `(venue, court, starts_at)` — **rejected
+by the database**, not by application code. A team's second game in one
+**league-local** day is rejected. Both errors name the conflicting game id.
+Deleting a game that has stat lines is refused and names the alternative.
+**Spec.** `10_scheduling.md` §3, §6.
+
+### T12 — StatsService [BLOCKED by T11]
+**Scope.** `player_game_stat_line` writes: 2PM/3PM/FTM stored, attempts nullable,
+points and FGM derived. Idempotent by `operation_id`.
+**Done when.** `stats.scoring-arithmetic` passes — 3 twos + 2 threes = **12**.
+`stats.makes-only-line-accepted` passes — a line with makes and no attempts saves.
+`stats.attempts-null-vs-zero` passes — `NULL` attempts yields `NULL` percentage,
+`0` yields `0`. No column anywhere stores a season total.
+**Spec.** `07_statistics.md` §1–§3.
+
+### T13 — GameResultService and the derivation edge [BLOCKED by T12]
+**Why.** The single missing edge in the legacy system. Game 1971 holds five real
+stat lines worth 81 points and reads `scheduled 0-0`.
+**Scope.** `game_result` as sole score authority; `result_source` per ADR-010;
+stat write → score derivation **in the same transaction**.
+**Done when.** `stats.derivation-edge`, `adr010.stat-lines-produce-score`,
+`adr010.derived-overwrite-refused`, `adr010.replay-does-not-alter-result` and
+`result.entered-refused-with-stats` all pass. Schema check: `game` has no score
+column.
+**Spec.** `08_game-results.md` §2–§3.
+
+### T14 — Finalisation and correction [BLOCKED by T13]
+**Scope.** `finalizeGame`, `correctFinalizedGame`, discrepancy detection and
+both-value recording (O5 default `warn`).
+**Done when.** Finalisation is operator-driven only — no time-based or automatic
+path exists. A correction returns the game to `completed` and cascades. A box
+score that disagrees with a recorded score is **detected and recorded with both
+values**, and does not block finalisation.
+**Spec.** `08_game-results.md` §4, §6, §7.
+
+---
+
+## Stage 3 — The live tracker [REBUILD]
+
+**Built early deliberately.** It has no legacy precedent, carries the most product
+risk, and is the thing the league actually asked for (S3).
+
+### T15 — Per-game capability tokens [BLOCKED by T14]
+**Scope.** Token issuance, scoping, hashing at rest, expiry, revocation,
+rate limiting.
+**Done when.** `sec.tracker-scope`, `sec.tracker-no-escalation`,
+`sec.tracker-expiry` and `sec.token-hashed` pass. **No tracker endpoint accepts a
+`game_id` parameter** — the scope comes from the token, so there is nothing to
+tamper with.
+**Spec.** `16_security.md` §2, `15_api.md` §5.
+
+### T16 — Tracker write surface [BLOCKED by T15]
+**Scope.** Stat entry, `scheduled → in_progress`, submit to `completed`.
+**Progressive persistence** — every increment is a write, no client-side buffer.
+**Done when.** `tracker.progressive-save` passes with a **real interruption**:
+enter stats, kill the tab mid-game, reopen, nothing lost. `tracker.idempotent-retry`
+passes. `tracker.cannot-finalize` passes.
+**Spec.** `07_statistics.md` §5.
+
+### T17 — Real-time propagation [BLOCKED by T16]
+**Scope.** Durable Objects + WebSockets (O7). Stat writes reach public read views
+without a refresh.
+**Done when.** A stat entered courtside appears on a public view within seconds,
+with no page reload, demonstrated on two simultaneous clients.
+**Spec.** `07_statistics.md` §5.
+
+---
+
+## Stage 4 — Standings [REBUILD]
+
+### T18 — StandingsService as a projection [BLOCKED by T14]
+**Scope.** Records computed from finalised games. **No mutation methods.**
+Config-version stamping.
+**Done when.** `standings.no-stored-record` (schema check: no wins/losses/rank
+column exists), `standings.recompute-equality`, `standings.deterministic` and
+**`standings.correction-reverses`** pass. That last one is the regression test for
+the legacy accumulator — an accumulator passes the forward test and fails this.
+**Spec.** `09_standings.md` §1–§3.
+
+### T19 — Tiebreak chains [BLOCKED by T18]
+**Scope.** The full criterion vocabulary, configurable and reorderable chains
+(S20), separate regular-season and playoff chains, multi-team strategies with
+`sub_table_restart` as default (O3), deterministic `coin_flip` fallback.
+**Done when.** `standings.tiebreak-order-applied`, `standings.tiebreak-total-order`,
+`standings.coin-flip-stable`, `standings.multi-team-strategy` and
+`standings.explains-adjacent` pass. Every tie resolves to a stable order and the
+engine **names the criterion that separated any adjacent pair**.
+**Spec.** `09_standings.md` §4.
+
+---
+
+## Stage 5 — Playoffs [REBUILD]
+
+### T20 — Seeds with basis snapshot [BLOCKED by T19]
+**Scope.** `finalizeSeeds` as an explicit operator action; `basis_snapshot`
+written in the **same transaction**; durability per O4 default.
+**Done when.** `seed.basis-snapshot-written` and `seed.separate-chain` pass. A
+post-seeding correction raises a **flagged discrepancy**, never a silent reseed.
+**Spec.** `11_playoffs.md` §3.
+
+### T21 — Bracket structure [BLOCKED by T20]
+**Scope.** `generateBracket` creating **every** match and **every**
+`winner_advances_to_match_id` edge before the bracket leaves `draft`. Byes as
+already-decided matches.
+**Done when.** `bracket.structural-progression` passes — **rename every round
+label in the database and no bracket behaviour changes**. That is the definitive
+regression test for the legacy defect. `bracket.structure-complete-before-seed`
+and `bracket.no-parallel-table` pass.
+**Spec.** `11_playoffs.md` §1–§4.
+
+### T22 — Propagation and bounded correction [BLOCKED by T21]
+**Scope.** One hop per transaction along FK edges; series decided from game
+results; correction propagation bounded.
+**Done when.** `bracket.propagation`, `bracket.series-derived`,
+`bracket.correction-no-change-no-propagate` and **`bracket.correction-bounded`**
+pass. Correct a first-round result and diff the whole database: every match not
+reachable along progression edges is **byte-identical**.
+**Spec.** `11_playoffs.md` §5.
+
+---
+
+## Stage 6 — Registration [REBUILD]
+
+### T23 — Public submission [BLOCKED by T10]
+**Scope.** Walk-up mobile flow, minimum required fields, progressive persistence,
+idempotent by `operation_id`, rate limited.
+**Done when.** `registration.submit-creates-only-registration` passes — **no
+Person, no Player, no membership on submit**. `registration.idempotent-submit`
+and `registration.progressive-save` pass.
+**Spec.** `12_registration.md` §2, §6.
+
+### T24 — Acceptance and assignment [BLOCKED by T23]
+**Scope.** Operator-confirmed identity matching; `assignToTeam` creating Person,
+Player and RosterMembership in **one transaction**.
+**Done when.** `registration.no-auto-match` passes — identical names produce a
+**suggestion, never a link**. `registration.assign-atomic` passes under fault
+injection at each of the four rows.
+**Spec.** `12_registration.md` §3, §7.
+
+### T25 — Eligibility, waiver and PII [BLOCKED by T24]
+**Scope.** Age verification against `age_as_of_date`; guardian signature required
+under 18 (S38); waiver artefact slot with `document_version`; PII isolation.
+**Done when.** `registration.age-as-of-date`, `registration.guardian-required`,
+`registration.waiver-version-recorded`, `registration.no-payment-field`,
+`registration.pii-not-public` and `registration.pii-not-logged` pass.
+**Do not build a custom e-signature flow** (O11).
+**Spec.** `12_registration.md` §4, §5, §8.
+
+---
+
+## Stage 7 — Bulk scheduling [REBUILD]
+
+**After individual operations, never before.** Bulk operations are compositions;
+composing unproven primitives multiplies their defects.
+
+### T26 — Schedule generation as a dry run [BLOCKED by T11]
+**Scope.** Parameter-driven generation (S21) returning a proposal plus a
+constraint report. A separate explicit `commitSchedule` writes games.
+**Done when.** `schedule.generate-is-dry-run` passes — `generate()` writes
+nothing. An unsatisfiable constraint set **names the constraint and where**,
+rather than returning an empty or partial schedule.
+**Spec.** `10_scheduling.md` §4.
+
+### T27 — Bulk rescheduling [BLOCKED by T26]
+**Scope.** `bulkReschedule` — atomic, dry run by default, full change-set
+emission for the G4 decision.
+**Done when.** `schedule.bulk-atomic` passes under injected mid-operation
+failure — **zero games moved**. `schedule.bulk-reports-all-conflicts` reports
+every conflict at once, not one at a time.
+**Spec.** `10_scheduling.md` §5.
+
+---
+
+## Stage 8 — Read surfaces [REBUILD]
+
+### T28 — Public API [BLOCKED by T19]
+**Scope.** Read endpoints with **deleted-row filtering in the data access layer,
+by construction**. Pagination everywhere. Typed domain errors.
+**Done when.** `api.deleted-filtered-everywhere` passes **by construction, not by
+audit** — the legacy equivalent required auditing 62 sites and still missed 11.
+`api.no-sql-in-routes`, `api.get-never-writes`, `api.null-percentages`,
+`api.pagination-enforced` and `api.status-codes-truthful` pass.
+**Spec.** `15_api.md` §4–§6.
+
+### T29 — Admin dashboard [BLOCKED by T28]
+**Scope.** Upcoming games front and centre; **a flag for played games missing
+scores or stats** (S26).
+**Done when.** `api.dashboard-flags-incomplete` passes. A game in game 1971's
+condition — real stat lines, no result — appears on the dashboard **the same
+day**, not months later in an audit.
+**Spec.** `15_api.md` §5.
+
+### T30 — AI read surface [BLOCKED by T28]
+**Scope.** Authenticated, read-only (S12). No embedded chatbot.
+**Done when.** It returns exactly what the public surface returns —
+authentication controls **access, not scope**. `api.no-pii-public` passes against
+this surface too.
+**Spec.** `15_api.md` §5.
+
+---
+
+## Stage 9 — Acceptance [REBUILD]
+
+### T31 — The full-season scenario [BLOCKED by T30]
+**Scope.** All 45 steps of `19_acceptance.md` §2, automated, running in CI.
+**Done when.** The scenario passes end to end, including the three hardest
+assertions: reversing a correction restores a **byte-identical** standings table;
+renaming every bracket round label changes **nothing**; deleting every projection
+and recomputing produces **byte-identical** results.
+**Spec.** `19_acceptance.md`.
+
+**On completion:** the definition of done in `19_acceptance.md` §1 is satisfied
+for every piece, and the specification's own claim — that a season can be run
+correctly end to end — is demonstrated rather than asserted.
 
 ---
 

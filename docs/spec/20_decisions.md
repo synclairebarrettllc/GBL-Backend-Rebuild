@@ -70,6 +70,40 @@ replaces it. Where they disagree, the Notion page wins.
 | S36 | Communication cadence: **only when flagged or blocked** | Session 6 |
 | S37 | Build **incrementally, piece by piece** — Synclaire's leaning, explicitly open to a research-informed different order | Session 4 |
 
+### Eligibility — S38, settled by the league 2026-09-09
+
+**GBL v1 allows minors to register and play.**
+
+| Value | Setting |
+|---|---|
+| Minors may register | **Yes.** A registration is **not** rejected solely because the applicant is under 18 |
+| `guardian_required_under` | **18** — under-18 applicants require a parent or legal guardian signature |
+| Signature record | The system records **who signed and their capacity** (`self` / `guardian`) |
+| Adults | Sign for themselves |
+| `age_as_of_date` | A **fixed season-level date**, set per season. **Never computed from "today"** |
+| `minimum_age` | **`null`** — no floor beyond guardian consent. *See note.* |
+
+**This reverses an earlier engineering recommendation** to make v1 18+ only, with
+minors and guardian workflow out of scope. That recommendation is **withdrawn by
+the league**. The guardian/minor architecture already in `12_registration.md` is
+therefore correct as written and should not be removed.
+
+**Note on `minimum_age`.** The league settled the guardian rule and did not state
+an age floor, so it is encoded as `null` — which is the faithful reading of
+"not rejected solely because the player is underage." This is the one eligibility
+value set by engineering rather than the league. **Cost to change:** config edit.
+
+**Why `age_as_of_date` cannot be defaulted or computed.** "18 years old" is
+meaningless without a reference date. Computing against the current date makes a
+player's eligibility change silently mid-season, on their birthday. The date is
+required at season activation and activation fails without it
+(`13_configuration.md` §6).
+
+**Consequence — the system stores minors' personal data**, including dates of
+birth and guardian details. `16_security.md` §7 applies to it without exception:
+admin-only, never in a public or AI-surface response, never in a log line, an
+error payload, or a URL.
+
 ### Architecture decisions ratified during specification authoring
 
 | # | Decision | Source |
@@ -155,7 +189,9 @@ convention.
 
 ### G3 — Build-piece inventory — DECIDED
 The inventory is the stage list in `21_implementation-order.md`, decomposed into
-tasks in `24_build-tasks.md`. The earlier "12-piece candidate" list is retired.
+**T1–T31** in `24_build-tasks.md` — Stage 0 through full-season acceptance, all
+of it, before the build starts. The earlier "12-piece candidate" list is
+retired.
 **Cost to change:** low — resequencing tasks is cheap; the dependency order is
 not arbitrary and should be preserved.
 
