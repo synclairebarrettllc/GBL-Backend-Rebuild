@@ -282,7 +282,8 @@ precedence rule between entry methods (`08_game-results.md` §2).
 **REQUIREMENT — import precedence.** A separate rule: an import never overwrites
 a locally authored result, whether `derived` or `entered`.
 
-**Evidence (FACT), verified in this repository:** migration 0029 defines
+**Evidence (FACT), verified in the legacy repository (`GBL-DOT-COM`):**
+migration 0029 defines
 `games.score_source` with a CHECK constraint; the importer guard at
 `scripts/import-recleague.cjs:409-420` skips games marked `live` and logs both
 values on disagreement; the write paths default to `'live'` so an undeclared

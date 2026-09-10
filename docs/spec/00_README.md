@@ -38,6 +38,21 @@ If any other document disagrees with this one about the backend:
 
 ---
 
+## Reading evidence citations
+
+Every FACT in this specification is backed by something observable. Most were
+observed in the **legacy system**, which lives in a **separate repository**
+(`GBL-DOT-COM`) and is still live and serving the league.
+
+**File paths in evidence citations — `src/index.tsx:3082`,
+`scripts/import-recleague.cjs:409-420`, `migrations/0029_*.sql`, table and row
+counts — refer to that legacy repository.** They are the proof behind a rule, not
+files in this one. Do not go looking for them here, and do not port them.
+
+Paths in requirements and tasks refer to **this** repository.
+
+---
+
 ## Where the boundaries are
 
 | Layer | Home | Authority |

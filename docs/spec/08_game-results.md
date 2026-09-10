@@ -76,7 +76,8 @@ This is a distinct rule from the authority rule above, and is named separately
 because the two are often conflated: the first governs *which store owns a
 score*, the second governs *who may act on it*.
 
-**Evidence (FACT) — verified in this repository on 2026-09-09:**
+**Evidence (FACT) — verified in the legacy repository (`GBL-DOT-COM`) on
+2026-09-09:**
 
 - Migration `0029_games_soft_delete_and_score_source.sql` adds
   `games.score_source TEXT DEFAULT NULL CHECK (score_source IN ('live','imported'))`.
@@ -122,7 +123,8 @@ correcting the roster afterward would silently change a completed game's score.
 is no queue, no nightly job, and no "recompute" button that a human has to
 remember to press.
 
-**Evidence (FACT) — verified in this repository on 2026-09-09.** Game 1971 is the
+**Evidence (FACT) — verified in the legacy repository (`GBL-DOT-COM`) on
+2026-09-09.** Game 1971 is the
 single row that demonstrates both halves of ADR-010 at once:
 
 | Property | Value |

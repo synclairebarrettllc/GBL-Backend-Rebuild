@@ -64,7 +64,8 @@ says which **store** owns a score; this says which **actor** may act on it. A
 locally authored `derived` result is protected here for the second reason, not
 the first.
 
-**Evidence (FACT) — verified in this repository on 2026-09-09:**
+**Evidence (FACT) — verified in the legacy repository (`GBL-DOT-COM`) on
+2026-09-09:**
 
 - `scripts/import-recleague.cjs:409-420` — the guard skips any game with
   `score_source = 'live'`, counts it as `protectedLive`, and emits
