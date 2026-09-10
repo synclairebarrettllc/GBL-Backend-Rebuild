@@ -65,7 +65,7 @@ automatically when the last game finalises. Someone declares the field.
 ordered**. `09_standings.md` §4 holds the vocabulary; `season.config.tiebreak
 .playoff_seeding` holds the chain.
 
-Multi-team ties are **UNKNOWN — O3**, and matter more here than anywhere else: a
+Multi-team ties are **POLICY — O3**, and matter more here than anywhere else: a
 3-way tie for the 4 seed determines who hosts and who travels.
 
 ### The basis snapshot
@@ -79,7 +79,7 @@ Six weeks later, after a correction, "why am I the 4 seed" must be answerable
 with what was true at the time. Without the snapshot the question has no answer,
 and recomputing current standings answers a different question.
 
-### Durability after a correction — UNKNOWN — O4
+### Durability after a correction — POLICY — O4
 
 If a week-9 result is corrected after seeding, standings legitimately change.
 Whether the bracket follows is **not an engineering question**.
@@ -90,10 +90,15 @@ Whether the bracket follows is **not an engineering question**.
 | **Reseed** | Seeds recomputed; the snapshot shows exactly what changed |
 | **Snapshot-based** | Already the model — seeds were always the snapshot |
 
-**All three are implementable against this schema with no change.** The
-specification does not choose. **Interim:** seeds are durable and a correction
-that would alter them raises a flagged discrepancy for the operator rather than
-silently reseeding or silently ignoring.
+**All three are implementable against this schema with no change**, so switching
+is a config edit.
+
+**Default: `durable`.** Seeds stand once announced. A correction that would have
+moved a seed raises a **flagged discrepancy** for the operator — never a silent
+reseed, never a silent contradiction.
+
+**Rationale.** Teams are told their seed and plan around it; moving it after the
+fact costs more trust than the accuracy gains.
 
 ---
 

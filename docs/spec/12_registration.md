@@ -99,7 +99,7 @@ change silently during the season.
 **REQUIREMENT (S10).** The waiver is legally binding and its signature is
 recorded as a durable artefact.
 
-**UNKNOWN — O11.** The e-signature **vendor** is a separate, later concern:
+**POLICY — O11.** The e-signature **vendor** is a separate, later concern:
 "ideally connected rather than built fully custom."
 
 **Typed slot:**
@@ -110,7 +110,7 @@ registration.waiver = {
   signed_at:        <timestamp>,
   signer_name:      <string>,
   signer_capacity:  'self' | 'guardian',
-  artifact_ref:     <UNKNOWN — O11: vendor reference | stored artifact id>,
+  artifact_ref:     <POLICY — O11: vendor reference | stored artifact id>,
   ip_address:       <string | null>
 }
 ```
@@ -155,11 +155,11 @@ Player, RosterMembership and the status change.
 ```
 season.config.roster = {
   max_players_per_team: <int | null>,
-  roster_lock_date:     <UNKNOWN — O6: date | null>
+  roster_lock_date:     <POLICY — O6: date | null>
 }
 ```
 
-**UNKNOWN — O6** governs roster lock dates and whether a player may appear for
+**POLICY — O6** governs roster lock dates and whether a player may appear for
 two teams in a season. Registration reads that config; it does not decide.
 
 ---

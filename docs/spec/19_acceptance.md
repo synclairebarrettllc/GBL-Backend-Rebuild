@@ -18,7 +18,8 @@ A build piece is done when **all** of these hold. Any one missing means
 4. Fault injection at every step leaves zero partial state.
 5. Its blast radius is bounded and tested.
 6. It introduces no second home for any fact in `03_source-of-truth.md`.
-7. Any UNKNOWN it touches is still an UNKNOWN — **not quietly resolved**.
+7. Every policy value it consumes **matches `20_decisions.md` Part 2** — not a
+   nearby value, not a more convenient one, and not one invented to unblock.
 8. Evidence is attached: commands run and their output.
 
 **REQUIREMENT — rule 7 is the one most likely to be violated under deadline.** A
@@ -98,8 +99,9 @@ This is a single automated scenario, not a checklist a human walks through.
 
 29. Assert standings are computed, carry a `config_version`, and can name the
     criterion separating any adjacent pair.
-30. Force a multi-team tie. Assert it is **flagged as unresolved-by-policy** while
-    O3 is open — not silently decided.
+30. Force a multi-team tie. Assert it resolves by the configured strategy
+    (default `sub_table_restart`), and that the output **names the strategy and
+    the separating criterion** — never a silent ordering.
 31. Snapshot the full standings table.
 32. Correct a finalized game from week 3. Assert the cascade ran.
 33. **Reverse the correction. Assert the standings table is byte-identical to the
@@ -146,7 +148,7 @@ Beyond the scenario:
 | **No silent failure** | Every rejected operation produces a typed, visible error (S26) |
 | **No second home** | Static checks pass; no fact has two authoritative stores |
 | **Bounded blast radius** | Every mutation's cascade is enumerated and tested |
-| **Open decisions intact** | Every UNKNOWN in `20_decisions.md` is still open or explicitly decided by the Board — never resolved by a builder |
+| **Decisions honoured** | Every value in `20_decisions.md` Part 2 is implemented as stated, written to config explicitly, failing loudly when absent — never substituted by a builder |
 | **Security** | Every test in `16_security.md` §11 passes |
 | **Operations** | Every gate in `17_operations.md` has demonstrably refused something |
 

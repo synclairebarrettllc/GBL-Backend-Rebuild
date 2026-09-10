@@ -85,7 +85,8 @@ For each build piece, confirm **all eight** or report it as not done
 4. Fault injection at every step leaves zero partial state
 5. Blast radius bounded and tested
 6. No second home for any fact in `03_source-of-truth.md`
-7. **Every UNKNOWN it touches is still UNKNOWN** — not quietly resolved
+7. **Every `POLICY` value it consumes matches the register** — not a nearby
+   value, not a hardcoded one
 8. Evidence attached: commands and their output
 
 ---
@@ -156,7 +157,7 @@ Do not report as defects:
 
 | Out of scope | Why |
 |---|---|
-| An open UNKNOWN being unimplemented | It is deliberately open. Report it only if it was **filled in** |
+| A `POLICY` slot carrying its registered value | That is correct behaviour. Report it only if the value **differs** from the register, or was hardcoded instead of configured |
 | Interim behaviour where a slot is empty | Specified in the relevant engine document |
 | Phase 2 items — migration, Season 3, RecLeague | Deferred by decision (D1, D2, O10) |
 | Missing offline tracker capture | Explicitly deferred (S7) |

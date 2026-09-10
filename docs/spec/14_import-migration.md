@@ -176,7 +176,7 @@ in CI.
 
 ---
 
-## 8. Source system — UNKNOWN — O10
+## 8. Source system — POLICY — O10
 
 Alignment documents name the current platform **Reckly**. The legacy importer
 targets **recleague.net**.

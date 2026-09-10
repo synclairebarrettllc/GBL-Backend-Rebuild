@@ -172,7 +172,7 @@ this team when this game was played" — a plain `team_id` on Player cannot.
 **Fill-ins are real (FACT).** Two legacy players rostered on The Clippers appear
 in a Kings box score on 2026-06-13. The current model has no way to express that.
 
-**UNKNOWN — O6.** Whether a Player may hold overlapping memberships (two teams at
+**POLICY — O6.** Whether a Player may hold overlapping memberships (two teams at
 once), whether a roster lock date exists, and what happens to statistics on
 transfer are **policy decisions**. The schema permits overlap; the domain service
 enforces whatever O6 decides. The enforcement point is specified; the rule is not.
@@ -252,7 +252,7 @@ all — so both modes exist in the real data.
 and is never inferred. A `derived` result may not be edited directly — correct
 the stat lines. An `entered` result may not be silently converted to `derived`.
 
-**UNKNOWN — O5.** Whether a `derived` result requires player points to sum
+**POLICY — O5.** Whether a `derived` result requires player points to sum
 exactly to the team score before finalisation is policy. The validation hook is
 specified in `08_game-results.md`; the rule is a typed empty slot.
 
@@ -337,7 +337,7 @@ from games. If a result is corrected after seeding and the seed was never
 persisted with its basis, the bracket's original justification is unrecoverable
 and "who should have been seeded where" becomes unanswerable.
 
-**UNKNOWN — O4.** Whether a correction reseeds the bracket, leaves it durable, or
+**POLICY — O4.** Whether a correction reseeds the bracket, leaves it durable, or
 something else is policy. **RECOMMENDATION:** durable seed plus basis snapshot.
 The field exists so the decision is implementable either way.
 
@@ -387,7 +387,7 @@ season-configured series rules.
 
 **Format and series length are configuration** (S21, `13_configuration.md` §5):
 the structure above expresses any of them without change. **Seeding rules remain
-UNKNOWN — O3** (multi-team ties) **and O4** (seed durability after a correction).
+POLICY — O3** (multi-team ties) **and O4** (seed durability after a correction).
 
 ---
 
@@ -409,7 +409,7 @@ A prospective player's submission to join a Season. **In scope (S10).**
 
 **REQUIREMENT.** Registration does **not** capture payment status (S10, S11).
 
-**UNKNOWN — O11.** The waiver vendor is undecided. `waiver_signature_ref` holds
+**POLICY — O11.** The waiver vendor is undecided. `waiver_signature_ref` holds
 an opaque external reference; its shape is deliberately unspecified.
 
 ---

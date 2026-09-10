@@ -1,8 +1,9 @@
 # 21 — Implementation Order
 
-**Status: RECOMMENDATION, pending G3.** The build-piece inventory is explicitly
-**derived, not locked** (`20_decisions.md`, G3). This sequence should be ratified
-before it is treated as a plan of record.
+**Status: the plan of record.** G3 is DECIDED — this sequence, decomposed into
+PR-sized tasks in `24_build-tasks.md`, *is* the build inventory
+(`20_decisions.md`). The order is dependency order, not preference; resequencing
+is cheap but the dependencies are real.
 
 ---
 
@@ -118,8 +119,8 @@ them.
 - Config-version stamping
 
 **Exit criteria.** `standings.recompute-equality`, `standings.deterministic`, and
-**`standings.correction-reverses`** all pass. Multi-team ties are **flagged**
-while O3 is open.
+**`standings.correction-reverses`** all pass. A multi-team tie resolves by the
+configured strategy and the output names it (O3 default: `sub_table_restart`).
 
 ---
 
@@ -188,28 +189,47 @@ RecLeague/Reckly integration. Undeferred by decision, not by drift.
 
 ---
 
-## 4. What must be decided when
+## 4. Which decision each stage consumes
 
-| Decision | Needed by | Consequence if still open |
+**Nothing here is open.** Every item has a value in `20_decisions.md` Part 2 —
+DECIDED (technical) or DEFAULT (league policy, changeable at a stated cost). This
+table says **when each value first matters**, so a change arriving later is
+recognised as rework rather than a surprise.
+
+**`20_decisions.md` is the only home for these values. This table does not restate
+them** — it points. If you want to know what the forfeit rule *is*, read the
+register, not this page.
+
+| Decision | First consumed at | Class |
 |---|---|---|
-| **G3** — build-piece inventory | **before Stage 1** | This sequence is unratified |
-| **G2** — technical rules constitution | before Stage 1 | Rules apply as new-build law by default |
-| **O7** — platform | before Stage 1 | DDL dialect and real-time transport unsettled |
-| **O9** — timezone semantics | Stage 2 | Recommendation applies; per-day rules ambiguous |
-| **O5** — finality completeness | Stage 2 | Finalisation does not check; discrepancy recorded |
-| **O1** — composite formulas | Stage 2 | Metrics ship without composites |
-| **O2** — forfeits | Stage 4 | Forfeited games excluded from standings |
-| **O3** — multi-team ties | Stage 4 | Ties flagged unresolved-by-policy |
-| **O12** — config retroactivity | Stage 4 | Version stamped; behaviour unsettled |
-| **O4** — seed durability | Stage 5 | Durable, with a flagged discrepancy |
-| **O6** — roster eligibility | Stage 6 | Overlaps permitted; fill-ins recorded |
-| **O11** — waiver vendor | Stage 6 | Slot present, unfilled |
-| **O8** — scheduling objectives | Stage 7 | Hard constraints only; balance reported |
-| **G4** — notifications | Stage 7 | Change set emitted, not delivered |
-| **O10** — Reckly vs recleague | Phase 2 | Source parameterised |
+| **G2** — principles as new-build law | Stage 1 | DECIDED |
+| **G3** — build inventory = the task queue | Stage 1 | DECIDED |
+| **O7** — platform | Stage 1 | DECIDED |
+| **O9** — timezone semantics | Stage 2 | DECIDED |
+| **O5** — stat-to-score discrepancy | Stage 2 | DEFAULT |
+| **O1** — composite formulas | Stage 2 | DEFAULT |
+| **O2** — forfeits | Stage 4 | DEFAULT |
+| **O3** — multi-team ties | Stage 4 | DEFAULT |
+| **O12** — config retroactivity | Stage 4 | DECIDED |
+| **O4** — seed durability | Stage 5 | DEFAULT |
+| **O6** — roster eligibility | Stage 6 | DEFAULT |
+| **O11** — waiver vendor | Stage 6 | DEFAULT + legal constraint |
+| **O8** — scheduling objectives | Stage 7 | DEFAULT |
+| **G4** — notifications | Stage 7 | DEFAULT |
+| **O10** — Reckly vs recleague | Phase 2 | OPEN-FACT — blocks nothing |
 
-**The cheapest unblocks are G3 and G2** — they cost a decision, not a discovery,
-and everything downstream keys off them.
+### Cost of a late change
+
+Most DEFAULTs are a config edit plus a recompute, because standings, totals and
+rankings are **projections** — nothing is stranded. The exceptions, worth
+reviewing before their stage rather than after:
+
+| Decision | Why a late change hurts |
+|---|---|
+| **O7** platform | Schema dialect and real-time transport depend on it |
+| **O9** timezone | A representation decision baked into every stored instant |
+| **O6** `multi_team_allowed` | Changing it after rosters exist means reconciling players who already appear twice |
+| **O2** forfeit score | Feeds point differential, the default first tiebreak |
 
 ---
 
@@ -221,5 +241,5 @@ and everything downstream keys off them.
 | Defer constraints until "the data settles" | Constraints added late get relaxed to fit bad data |
 | Build bulk operations before individual ones | Composition multiplies defects |
 | Ship a read that depends on an unapplied migration | Both production outages, exactly (FACT) |
-| Resolve an UNKNOWN to unblock yourself | Converts a league decision into a silent default |
+| Substitute your own value for a stated one | Converts a league decision into a silent default |
 | Leave the guards for the end | They are the cheapest thing in Stage 0 and the most expensive omission |

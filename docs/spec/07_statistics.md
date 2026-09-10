@@ -76,7 +76,7 @@ and the team score. Do **not** require every rostered player to have a line. Do
 posted score. That is source-side reality, faithfully reproduced. A validator
 that rejects it would make real games unrecordable.
 
-**UNKNOWN — O5.** Whether a *derived* result requires player points to sum to the
+**POLICY — O5.** Whether a *derived* result requires player points to sum to the
 team score **before finalisation** is policy. The hook exists in
 `08_game-results.md`; the rule is a typed empty slot. Until decided,
 finalisation does not check it.
@@ -145,20 +145,22 @@ eFG%  = (field_goals_made + 0.5·three_pointers_made) / field_goals_attempted
 PPG, RPG, APG, SPG, BPG = total / games_played
 ```
 
-### UNKNOWN — O1: the composite formulas
+### O1 — the composite formulas — DEFAULT set
 
 PER, PIR and "efficiency rating" each have **multiple published definitions that
-produce different results**. The specification does not choose one.
+produce different results**, so the formula in use must be **published**, not
+assumed. S9's stated purpose is that a player can redo the arithmetic themselves
+and accept the outcome; a formula nobody can reproduce defeats the reason the
+metric exists.
 
-**Why this must be decided and published, not defaulted.** S9 states the purpose
-is that a player can calculate the number themselves and accept the outcome. A
-formula nobody can reproduce defeats the entire reason the metric exists.
+**Default: the standard PIR/EFF formula**, chosen because it is computable from
+statistics GBL already collects and is arithmetically transparent.
 
 **Slot:**
 
 ```
 season.config.composite_metrics = [
-  { key: <string>, display_name: <string>, formula: <UNKNOWN — O1>, decimals: <int> }
+  { key: <string>, display_name: <string>, formula: <POLICY — O1>, decimals: <int> }
 ]
 ```
 

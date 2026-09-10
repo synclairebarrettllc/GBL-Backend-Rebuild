@@ -103,7 +103,7 @@ Three categories, exhaustively:
 |---|---|
 | **Evidence-driven** | A failure happened. The rule prevents its recurrence. The table above. |
 | **Decision-driven** | The league decided (S-numbered). The specification implements it. |
-| **Deliberately open** | Nobody has decided. A **typed UNKNOWN slot** exists and stays empty. |
+| **Policy-governed** | A **typed `POLICY` slot** carrying the value set in `20_decisions.md` Part 2 — DECIDED or DEFAULT, changeable, never hardcoded. |
 
 **REQUIREMENT.** A rule that fits none of these three categories is an
 engineering preference wearing a requirement's clothes, and should be challenged.

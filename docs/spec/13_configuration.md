@@ -71,9 +71,10 @@ nothing and is unrecoverable after the fact.
 
 ## 5. The configuration schema
 
-This is the complete surface. **Every `UNKNOWN` below is a decision GBL must
-make**, cross-referenced to `20_decisions.md`. A builder must not resolve one by
-picking something reasonable.
+This is the complete surface. **Every `POLICY` slot below has a value in
+`20_decisions.md` Part 2** — build that value. A builder must not substitute its
+own, and must not let code supply one silently: a missing key still fails loudly
+(§6).
 
 ```
 season.config = {
@@ -82,22 +83,22 @@ season.config = {
   tiebreak: {
     regular_season:  [ <criterion>, ... ],      // S20 — default: point_differential
     playoff_seeding: [ <criterion>, ... ],      // S20 — separate chain
-    multi_team_rule: <UNKNOWN — O3>,
+    multi_team_rule: <POLICY — O3>,
     final_fallback:  <criterion>                // must yield a total ordering
   },
 
   // ── Game results ────────────────────────────────────  08_game-results.md
   finalization_rule: {
-    require_box_score_sum: <UNKNOWN — O5: boolean>,
-    tolerance_points:      <UNKNOWN — O5: int | null>,
-    on_mismatch:           <UNKNOWN — O5: 'block' | 'warn' | 'allow'>
+    require_box_score_sum: <POLICY — O5: boolean>,
+    tolerance_points:      <POLICY — O5: int | null>,
+    on_mismatch:           <POLICY — O5: 'block' | 'warn' | 'allow'>
   },
 
   forfeit_rule: {
-    counts_as:        <UNKNOWN — O2: 'win_loss' | 'no_contest'>,
-    awarded_score:    <UNKNOWN — O2: [int, int] | null>,
-    player_stats:     <UNKNOWN — O2: 'none' | 'preserved'>,
-    affects_tiebreak: <UNKNOWN — O2: boolean>
+    counts_as:        <POLICY — O2: 'win_loss' | 'no_contest'>,
+    awarded_score:    <POLICY — O2: [int, int] | null>,
+    player_stats:     <POLICY — O2: 'none' | 'preserved'>,
+    affects_tiebreak: <POLICY — O2: boolean>
   },
 
   // ── Statistics ──────────────────────────────────────  07_statistics.md
@@ -106,15 +107,15 @@ season.config = {
     min_games_for_leaderboard: <int>,
     composite_metrics: [
       { key: <string>, display_name: <string>,
-        formula: <UNKNOWN — O1>, decimals: <int> }
+        formula: <POLICY — O1>, decimals: <int> }
     ]
   },
 
   // ── Rosters and eligibility ─────────────────────────  12_registration.md
   roster: {
     max_players_per_team: <int | null>,
-    roster_lock_date:     <UNKNOWN — O6: date | null>,
-    multi_team_allowed:   <UNKNOWN — O6: boolean>,
+    roster_lock_date:     <POLICY — O6: date | null>,
+    multi_team_allowed:   <POLICY — O6: boolean>,
     fill_ins_allowed:     <boolean>             // FACT: they already happen
   },
 
@@ -128,7 +129,7 @@ season.config = {
   schedule: {
     format:             'round_robin' | 'double_round_robin' | 'custom',
     games_per_team:     <int>,
-    objective_priority: [ <UNKNOWN — O8: ordered objective keys> ],
+    objective_priority: [ <POLICY — O8: ordered objective keys> ],
     timezone:           <IANA zone>             // O9 recommendation
   },
 
@@ -142,7 +143,7 @@ season.config = {
       series_length:   <int>,
       home_court_rule: <config>
     },
-    seed_durability: <UNKNOWN — O4: 'durable' | 'reseed' | 'snapshot'>
+    seed_durability: <POLICY — O4: 'durable' | 'reseed' | 'snapshot'>
   },
 
   // ── Display ─────────────────────────────────────────

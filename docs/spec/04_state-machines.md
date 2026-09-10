@@ -24,7 +24,7 @@ anything and must not appear as status values.
 | `completed` | happened, outcome recorded |
 | `finalized` | outcome locked; further change requires an explicit correction |
 | `cancelled` | will not happen; not counted |
-| `forfeited` | did not happen as contested; counted per policy (**UNKNOWN — O2**) |
+| `forfeited` | did not happen as contested; counted per policy (**POLICY — O2**) |
 | `archived` | historical, read-only |
 | `void` | created in error; excluded from everything |
 
@@ -78,10 +78,10 @@ scheduled ──► in_progress ──► completed ──► finalized
 | `scheduled` | `in_progress` | first stat line written, or explicit start | tracker / admin | game is today or admin override | — |
 | `scheduled` | `completed` | result entered directly | admin | valid scores | GameResult created (`entered`) |
 | `in_progress` | `completed` | tracker submits, or admin completes | tracker / admin | see O5 | GameResult created/updated (`derived`) |
-| `completed` | `finalized` | finalize | admin | **UNKNOWN — O5** completeness rule | standings recomputed; seed eligibility opens |
-| `finalized` | `completed` | **correction** | admin | correction permitted (**UNKNOWN — O8-equivalent**) | downstream recompute cascades |
+| `completed` | `finalized` | finalize | admin | **POLICY — O5** completeness rule | standings recomputed; seed eligibility opens |
+| `finalized` | `completed` | **correction** | admin | correction permitted (**POLICY — O8-equivalent**) | downstream recompute cascades |
 | `scheduled` | `cancelled` | cancel | admin | — | excluded from standings |
-| any non-final | `forfeited` | forfeit | admin | **UNKNOWN — O2** | counted per policy |
+| any non-final | `forfeited` | forfeit | admin | **POLICY — O2** | counted per policy |
 
 **Illegal:** `cancelled` → `completed`. `scheduled` → `finalized` (must pass
 through `completed`). Any transition that destroys stat lines.
@@ -135,7 +135,7 @@ Not a rich lifecycle: a membership is open (`effective_to IS NULL`) or closed.
 A transfer closes one membership and opens another. **Closing a membership never
 touches stat lines** — those reference Player and carry their own `team_id`.
 
-**UNKNOWN — O6.** Whether overlapping open memberships are legal is policy. The
+**POLICY — O6.** Whether overlapping open memberships are legal is policy. The
 state machine permits it; RosterService enforces whatever O6 decides.
 
 ---

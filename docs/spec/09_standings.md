@@ -39,7 +39,7 @@ does not require it.
 
 ```
 countable(game) = game.deleted_at IS NULL
-              AND game.status IN ('finalized', <forfeited per O2>)
+              AND game.status IN ('finalized', 'forfeited')   -- per O2 default
               AND game.season_id = ?
 ```
 
@@ -109,7 +109,7 @@ migration.
 season.config.tiebreak = {
   regular_season: [ <criterion>, ... ],
   playoff_seeding: [ <criterion>, ... ],
-  multi_team_rule: <UNKNOWN — O3>,
+  multi_team_rule: <per O3 — default 'sub_table_restart'>,
   final_fallback:  <criterion>          // must be total-ordering
 }
 ```
@@ -138,31 +138,44 @@ a league loses an argument it should have won.
 different answer on refresh is unusable. Seeding it from stable identifiers means
 the result can be recomputed and defended.
 
-### Multi-team ties — UNKNOWN — O3
+### Multi-team ties — O3, DEFAULT set
 
-When three or more teams tie, the following are all defensible and produce
-**different brackets**:
+When three or more teams tie, several approaches are defensible and they produce
+**different brackets**. All are implemented as selectable strategies; none
+requires a schema change.
 
-1. Apply the chain to the whole tied group at once.
-2. Build a sub-table among the tied teams, then apply the chain within it.
-3. Break the top team out, then **restart the chain** for the remainder.
-4. Skip `head_to_head` entirely when the tied teams have not all played
-   each other.
+| Strategy | Behaviour |
+|---|---|
+| `whole_group` | Apply the chain to the entire tied group at once |
+| **`sub_table_restart`** | **DEFAULT** — build a sub-table among the tied teams only, apply the chain within it, break out the top team, then **restart the chain** for the remainder |
+| `break_top_restart` | Break out the top team, restart for the rest, without a sub-table |
 
-**The specification does not choose.** The engine implements the selected rule as
-a strategy; all four are implementable without schema change.
+**`head_to_head` is skipped for a tied group whose members have not all played
+each other**, rather than applied on partial data. That guard is active under
+every strategy.
 
-**REQUIREMENT for the interim.** Until O3 is decided, a multi-team tie is
-computed with option 1 **and flagged in the output** as unresolved-by-policy, so
-it is visible rather than silently decided.
+**Default rationale.** `sub_table_restart` is the most common convention in league
+play and the easiest to explain to a team that lost a tiebreak — which matters,
+because that is the conversation this rule exists for.
+
+**Changeable at any time** (`20_decisions.md`, O3): a config edit plus a
+recompute. Standings are a projection, so nothing is stranded.
+
+**REQUIREMENT — the engine reports which strategy resolved the tie**, and which
+criterion separated each adjacent pair inside it. A team that lost a three-way
+tiebreak is owed the reason, and "the algorithm decided" is not one.
 
 ---
 
-## 5. Forfeits — UNKNOWN — O2
+## 5. Forfeits — O2, DEFAULT set
 
-`countable()` above carries a typed slot for whether `forfeited` games enter the
-record, and `08_game-results.md` §5 holds the full configuration shape. The
-standings engine reads that config; it does not decide.
+**Default:** a forfeit counts as a win/loss at `20-0`, accrues no player
+statistics, and affects tiebreaks. `08_game-results.md` §5 holds the full
+configuration shape; `20_decisions.md` O2 holds the value and the rationale.
+
+The standings engine **reads that config and does not decide**. The `20-0` score
+matters here specifically: point differential is the S20 default first tiebreak,
+so the awarded score feeds directly into seeding.
 
 ---
 
@@ -173,8 +186,9 @@ their results, and the season config version. Nothing else — not wall-clock ti
 not row insertion order, not a database-default sort.
 
 **REQUIREMENT.** Every standings table carries the **config version** it was
-computed under. This is what makes O12 (retroactivity) decidable later without
-rework: the stamp exists either way.
+computed under. O12 is DECIDED as **retroactive** — a config change re-ranks the
+season under the new chain — and the stamp is what keeps that explicable: any
+published table can still say which rules produced it.
 
 **REQUIREMENT — explain the ordering.** For any two adjacent teams, the engine can
 state which criterion separated them.
@@ -216,7 +230,7 @@ Recompute-from-source is the only update mechanism.
 | `standings.tiebreak-order-applied` | Reordering the chain reorders the table accordingly |
 | `standings.tiebreak-total-order` | Every tie resolves to a stable order; fallback is reported |
 | `standings.coin-flip-stable` | The seeded tiebreak returns the same result every run |
-| `standings.multi-team-flagged` | A 3-way tie is flagged as unresolved-by-policy while O3 is open |
+| `standings.multi-team-strategy` | A 3-way tie resolves by the configured strategy, and the output names which one and which criterion separated each pair |
 | `standings.config-version-stamped` | Every computed table names its config version |
 | `standings.explains-adjacent` | The engine names the separating criterion for any adjacent pair |
 

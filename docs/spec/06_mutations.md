@@ -299,7 +299,7 @@ stat lines. An endpoint that lets an operator type over a derived score
 reintroduces two homes for one fact.
 
 #### `finalizeGame(game_id)`
-- **Preconditions:** game `completed`; a result exists; **UNKNOWN — O5**
+- **Preconditions:** game `completed`; a result exists; **POLICY — O5**
   completeness rule
 - **Effect:** game → `finalized`; result → `final`
 - **Cascade:** standings recomputed; seed eligibility opens
@@ -325,13 +325,13 @@ the lock, and defined no propagation at all.
 ### 4.7 PlayoffService
 
 #### `finalizeSeeds(season_id)`
-- **Preconditions:** regular season games all resolved; seeding rules configured (**UNKNOWN — O3**)
+- **Preconditions:** regular season games all resolved; seeding rules configured (**POLICY — O3**)
 - **Effect:** `playoff_seed` rows with `finalized_at` and **`basis_snapshot`** — the standings rows used
 - **Cascade:** bracket becomes generatable
 - **REQUIREMENT:** the snapshot is written in the same transaction as the seeds.
   A seed without its basis cannot be explained to a team six weeks later.
 
-#### `reseed(season_id)` — behaviour is **UNKNOWN — O4**
+#### `reseed(season_id)` — behaviour is **POLICY — O4**
 - The operation is specified; its *legality after finalisation* is policy.
 - All three candidate policies (durable / reseed / snapshot-based) are
   implementable against this schema without change.
@@ -390,8 +390,9 @@ required changes at 24 sites.
 #### `updateSeasonConfig(season_id, config)`
 - **Preconditions:** config passes schema validation; season not `archived`
 - **Effect:** replaces `season.config`
-- **Cascade:** **UNKNOWN — O12.** Whether changing a tiebreak chain mid-season
-  retroactively re-ranks completed weeks is policy, not engineering.
+- **Cascade:** **O12 — DECIDED: retroactive.** Changing a tiebreak chain
+  re-ranks the season under the new chain. Standings are a projection, so this is
+  a recompute, not a migration.
 - **REQUIREMENT:** every config write is versioned so that a standings table can
   state which config produced it.
 

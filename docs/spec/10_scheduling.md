@@ -82,7 +82,7 @@ params = {
   blackout_dates:    [ <date> ],
   start_date:        <date>,
   weeks:             <int>,
-  objective_priority: <UNKNOWN — O8>
+  objective_priority: <POLICY — O8>
 }
 ```
 
@@ -95,7 +95,7 @@ proposed schedule plus a constraint report. A separate, explicit
 returns **which constraint could not be satisfied and where** — not an empty
 result and not a partial schedule.
 
-### Objective priority — UNKNOWN — O8
+### Objective priority — POLICY — O8
 
 S22 fixes the two hard constraints. When many valid schedules exist, what is
 optimised — home/away balance, rest days between games, venue fairness,
@@ -105,7 +105,7 @@ decided.
 **Typed slot:**
 
 ```
-objective_priority = [ <UNKNOWN — O8: ordered list of objective keys> ]
+objective_priority = [ <POLICY — O8: ordered list of objective keys> ]
 ```
 
 **Interim behaviour:** the engine satisfies the hard constraints, applies no

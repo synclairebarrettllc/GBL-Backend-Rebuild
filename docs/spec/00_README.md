@@ -5,9 +5,10 @@
 A competent engineer should be able to build the system from these documents
 without reading the legacy code and without inventing league rules.
 
-**Status: AUTHORED.** All sections are written. Sections blocked on league policy
-carry **typed UNKNOWN slots** — the shape is specified and only the value is
-missing. See §Status below.
+**Status: AUTHORED, and nothing blocks the build.** Every league-policy value has
+been set — see `20_decisions.md` Part 2. Policy-governed behaviour is carried in
+**typed `POLICY` slots** so each value lives in config, visible and changeable,
+rather than hardcoded.
 
 ---
 
@@ -164,12 +165,13 @@ decoration — they say how much weight a claim can bear.**
 - **REQUIREMENT** — the new system must do this. Established, not proposed.
 - **RECOMMENDATION** — a proposed design choice. **Not binding.** A builder may
   raise a better option.
-- **UNKNOWN** — appears throughout the engine documents as a typed slot. **It
-  does not mean "blocked."** Every one has a value set in `20_decisions.md`
-  Part 2, marked **DECIDED** (technical, mine under S34) or **DEFAULT** (league
-  policy, set so the build proceeds and changeable at a stated cost). The slot
-  stays typed so the value is visible and reversible rather than buried in code.
-  **A builder implements the stated value and never substitutes its own.**
+- **POLICY — O<n> / G<n>** — a typed slot whose value is governed by that entry
+  in `20_decisions.md` Part 2. **It does not mean "undecided" and it never means
+  "blocked."** Every one has a value, marked **DECIDED** (technical, mine under
+  S34) or **DEFAULT** (league policy, set so the build proceeds, changeable at a
+  stated cost). The slot stays typed so the value lives in config where it is
+  visible and reversible, rather than buried in code. **A builder implements the
+  stated value and never substitutes its own.**
 
 An INFERENCE or RECOMMENDATION becomes a REQUIREMENT only by an explicit,
 recorded decision. That promotion is itself a change to this specification.

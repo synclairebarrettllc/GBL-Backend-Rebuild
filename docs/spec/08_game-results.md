@@ -141,7 +141,7 @@ never built.
 
 ---
 
-## 4. Stat-to-score discrepancy — UNKNOWN — O5 / POLICY-013
+## 4. Stat-to-score discrepancy — POLICY — O5 / POLICY-013
 
 **The question is no longer "should scores derive from stats?"** — ADR-010
 settles that (§2). What remains open is narrower and genuinely a league decision:
@@ -181,10 +181,10 @@ reconciling.* The new system formalises that instead of inventing it.
 
 ```
 season.config.finalization_rule = {
-  require_box_score_sum: <UNKNOWN — O5: boolean>,
-  tolerance_points:      <UNKNOWN — O5: integer | null>,
-  on_mismatch:           <UNKNOWN — O5: 'block' | 'warn' | 'allow'>,
-  override_requires:     <UNKNOWN — O5: 'none' | 'reason' | 'named_authority'>
+  require_box_score_sum: <POLICY — O5: boolean>,
+  tolerance_points:      <POLICY — O5: integer | null>,
+  on_mismatch:           <POLICY — O5: 'block' | 'warn' | 'allow'>,
+  override_requires:     <POLICY — O5: 'none' | 'reason' | 'named_authority'>
 }
 ```
 
@@ -201,7 +201,7 @@ discrepancies without re-deriving anything.
 
 ---
 
-## 5. Forfeits — UNKNOWN — O2
+## 5. Forfeits — POLICY — O2
 
 A forfeit is a real league outcome and the schema supports it. What it *counts
 as* is policy.
@@ -210,10 +210,10 @@ as* is policy.
 
 ```
 season.config.forfeit_rule = {
-  counts_as:        <UNKNOWN — O2: 'win_loss' | 'no_contest'>,
-  awarded_score:    <UNKNOWN — O2: [int, int] | null>,
-  player_stats:     <UNKNOWN — O2: 'none' | 'preserved'>,
-  affects_tiebreak: <UNKNOWN — O2: boolean>
+  counts_as:        <POLICY — O2: 'win_loss' | 'no_contest'>,
+  awarded_score:    <POLICY — O2: [int, int] | null>,
+  player_stats:     <POLICY — O2: 'none' | 'preserved'>,
+  affects_tiebreak: <POLICY — O2: boolean>
 }
 ```
 
@@ -257,7 +257,7 @@ traceable**, not to make it hard.
    - if the match winner changes, propagate **one hop along
      `winner_advances_to_match_id`**, repeating only where a winner actually
      changed
-4. Playoff seeds: **UNKNOWN — O4**
+4. Playoff seeds: **POLICY — O4**
 
 **REQUIREMENT — bounded.** Every match not reachable from the corrected game
 along progression edges is byte-identical afterward. Tested as

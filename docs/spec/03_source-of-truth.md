@@ -150,8 +150,10 @@ carries `basis_snapshot` — the standings rows it was computed from.
   changed.
 - If policy says **snapshot-based**: already the model.
 
-**UNKNOWN — O4.** All three are implementable without schema change. The
-specification does not choose.
+**POLICY — O4. Default: `durable`.** The seed stands; the snapshot explains any
+later divergence, and a correction that would have moved it raises a flagged
+discrepancy rather than silently reseeding. All three remain implementable
+without schema change, so this is a config edit.
 
 ---
 
